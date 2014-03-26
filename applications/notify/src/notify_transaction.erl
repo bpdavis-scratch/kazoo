@@ -90,7 +90,9 @@ build_and_send_email(TxtBody, HTMLBody, Subject, To, Props) ->
              ,[]
              ,[{<<"multipart">>, <<"alternative">>, [], []
                 ,[{<<"text">>, <<"plain">>, [{<<"Content-Type">>, <<"text/plain">>}], [], iolist_to_binary(TxtBody)}
-                  ,{<<"text">>, <<"html">>, [{<<"Content-Type">>, <<"text/html">>}], [], iolist_to_binary(HTMLBody)}
+                  ,{<<"text">>, <<"html">>, [{<<"Content-Type">>, <<"text/html">>}
+                                             ,{<<"Content-Transfer-Encoding">>, <<"quoted-printable">>}
+                                            ], [], iolist_to_binary(HTMLBody)}
                  ]
                }
               ]
