@@ -31,6 +31,7 @@
               ,<<"Media">>, <<"Hold-Media">>, <<"Ringback">>
               ,<<"Custom-Channel-Vars">>, <<"Secure-RTP">>, <<"Force-Fax">>
               ,<<"SIP-Transport">>, <<"SIP-Headers">>
+              ,<<"Ignore-Completed-Elsewhere">>
               ,<<"Enable-T38-Fax">>
               ,<<"Enable-T38-Fax-Request">>
               ,<<"Enable-T38-Passthrough">>
@@ -68,6 +69,7 @@
                ,<<"Custom-Channel-Vars">>, <<"Auth-User">>, <<"Auth-Password">>
                ,<<"Endpoint-Type">>, <<"Endpoint-Options">>, <<"Force-Fax">>
                ,<<"Proxy-IP">>, <<"Forward-IP">>, <<"SIP-Transport">>
+               ,<<"Ignore-Completed-Elsewhere">>
                ,<<"SIP-Interface">>
                ,<<"Enable-T38-Fax">>
                ,<<"Enable-T38-Fax-Request">>
@@ -267,7 +269,11 @@
 
 %% Recv Fax
 -define(RECV_FAX_HEADERS, [<<"Application-Name">>, <<"Call-ID">>]).
--define(OPTIONAL_RECV_FAX_HEADERS, []).
+-define(OPTIONAL_RECV_FAX_HEADERS, [<<"Enable-T38-Fax">>
+                                    ,<<"Enable-T38-Fax-Request">>
+                                    ,<<"Enable-T38-Passthrough">>
+                                    ,<<"Enable-T38-Gateway">>
+                                   ]).
 -define(RECV_FAX_VALUES, [{<<"Event-Category">>, <<"call">>}
                           ,{<<"Event-Name">>, <<"command">>}
                           ,{<<"Application-Name">>, <<"receive_fax">>}

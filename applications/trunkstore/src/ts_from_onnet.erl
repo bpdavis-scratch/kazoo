@@ -116,8 +116,7 @@ onnet_data(CallID, AccountId, FromUser, ToDID, Options, State) ->
     Q = ts_callflow:get_my_queue(State),
     Command = [ KV
                 || {_,V}=KV <- CallerID ++ EmergencyCallerID ++
-                       [
-                        {<<"Call-ID">>, CallID}
+                       [{<<"Call-ID">>, CallID}
                         ,{<<"Resource-Type">>, <<"audio">>}
                         ,{<<"To-DID">>, ToDID}
                         ,{<<"Account-ID">>, AccountId}
@@ -129,9 +128,7 @@ onnet_data(CallID, AccountId, FromUser, ToDID, Options, State) ->
                         ,{<<"Ringback">>, wh_json:get_value(<<"ringback">>, DIDOptions)}
                         ,{<<"SIP-Headers">>, SIPHeaders}
                         ,{<<"Hunt-Account-ID">>, wh_json:get_value(<<"hunt_account_id">>, SrvOptions)}
-                        ,{<<"Custom-Channel-Vars">>, wh_json:from_list([{<<"Inception">>, <<"on-net">>}
-                                                                        ,{<<"Account-ID">>, AccountId}
-                                                                       ])}
+                        ,{<<"Custom-Channel-Vars">>, wh_json:from_list([{<<"Account-ID">>, AccountId}])}
                         | wh_api:default_headers(Q, ?APP_NAME, ?APP_VERSION)
                        ],
                    V =/= 'undefined',
@@ -155,7 +152,13 @@ wait_for_win(State, Command) ->
     case ts_callflow:wait_for_win(State) of
         {'lost', _} -> 'normal';
         {'won', State1} ->
-            send_offnet(State1, Command)
+            case ts_util:maybe_restrict_call(State1, Command) of
+                'true' ->
+                      lager:debug("Trunkstore call to ~p restricted", [props:get_value(<<"To-DID">>, Command)]),
+                      ts_callflow:send_hangup(State1, <<"403">>);
+                 _ ->
+                      send_offnet(State1, Command)
+            end
     end.
 
 send_offnet(State, Command) ->

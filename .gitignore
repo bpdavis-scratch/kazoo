@@ -1,4 +1,5 @@
 .eunit
+.erlang.cookie
 *~
 .#*
 *.log*
@@ -23,6 +24,7 @@ deps/rabbitmq_server-*/dist/
 deps/rabbitmq_server-*/include/rabbit_framing.hrl
 deps/rabbitmq_server-*/plugins-src/*/build/
 deps/rabbitmq_server-*/plugins-src/*/dist/
+deps/rabbitmq_server-*/plugins-src/sockjs-erlang-wrapper/hash.mk
 deps/rabbitmq_server-*/plugins-src/eldap-wrapper/eldap-git/generated/
 deps/rabbitmq_server-*/plugins-src/rabbitmq-erlang-client/deps.mk
 deps/rabbitmq_server-*/plugins-src/rabbitmq-erlang-client/deps/
@@ -44,3 +46,4 @@ applications/*/priv/archive_data/*
 /deps/rabbitmq_server-3.2.0/plugins-src/rabbitmq-amqp1.0/include/rabbit_amqp1_0_framing.hrl
 /deps/rabbitmq_server-3.2.0/plugins-src/rabbitmq-amqp1.0/src/rabbit_amqp1_0_framing0.erl
 /.edts
+/deps/erlang-localtime-1.0.0/include/tz_index.hrl

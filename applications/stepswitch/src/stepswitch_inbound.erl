@@ -77,7 +77,8 @@ set_account_id(NumberProps, JObj) ->
 -spec set_inception(wh_proplist(), wh_json:object()) ->
                            wh_json:object().
 set_inception(_, JObj) ->
-    wh_json:set_value(?CCV(<<"Inception">>), <<"off-net">>, JObj).
+    Request = wh_json:get_value(<<"Request">>, JObj),
+    wh_json:set_value(?CCV(<<"Inception">>), Request, JObj).
 
 %%--------------------------------------------------------------------
 %% @private
@@ -91,7 +92,13 @@ maybe_find_resource(_NumberProps, JObj) ->
     case stepswitch_resources:reverse_lookup(JObj) of
         {'error', 'not_found'} -> JObj;
         {'ok', ResourceProps} ->
-            maybe_add_resource_id(JObj, ResourceProps)
+            Routines = [fun maybe_add_resource_id/2
+                       ,fun maybe_add_t38_settings/2                        
+                       ],
+            lists:foldl(fun(F, J) ->  F(J, ResourceProps) end
+                       ,JObj
+                       ,Routines
+                       )           
     end.
 
 -spec maybe_add_resource_id(wh_json:object(), wh_proplist()) -> wh_json:object().
@@ -103,6 +110,21 @@ maybe_add_resource_id(JObj, ResourceProps) ->
                               ,props:get_value('resource_id', ResourceProps)
                               ,JObj
                              )
+    end.
+
+maybe_add_t38_settings(JObj, ResourceProps) ->
+    case props:get_value('fax_option', ResourceProps) of
+        'true' ->
+            wh_json:set_value(?CCV(<<"Resource-Fax-Option">>)
+                             ,props:get_value('fax_option', ResourceProps)
+                             ,JObj
+                             );
+        <<"auto">> ->
+            wh_json:set_value(?CCV(<<"Resource-Fax-Option">>)
+                             ,props:get_value('fax_option', ResourceProps)
+                             ,JObj
+                             );
+        _ -> JObj                
     end.
 
 -spec maybe_format_destination(wh_proplist(), wh_json:object()) -> wh_json:object().

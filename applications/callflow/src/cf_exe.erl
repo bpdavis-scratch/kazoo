@@ -398,7 +398,9 @@ handle_info('initialize', #state{call=Call}) ->
                 ,fun(C) -> whapps_call:call_id_helper(fun cf_exe:callid/2, C) end
                 ,fun(C) -> whapps_call:control_queue_helper(fun cf_exe:control_queue/2, C) end
                ],
-    {'noreply', #state{call=lists:foldr(fun(F, C) -> F(C) end, Call, Updaters)
+    CallWithHelpers = lists:foldr(fun(F, C) -> F(C) end, Call, Updaters),
+    spawn('cf_singular_call_hooks', 'maybe_hook_call', [CallWithHelpers]),
+    {'noreply', #state{call=CallWithHelpers
                        ,flow=Flow
                       }};
 handle_info({'DOWN', Ref, 'process', Pid, 'normal'}, #state{cf_module_pid={Pid, Ref}
@@ -660,7 +662,7 @@ log_call_information(Call) ->
     lager:info("from ~s", [whapps_call:from(Call)]),
     lager:info("CID ~s ~s", [whapps_call:caller_id_name(Call), whapps_call:caller_id_number(Call)]),
     case whapps_call:inception(Call) of
-        <<"on-net">> -> lager:info("inception on-net: using attributes for an internal call", []);
+        'undefined' -> lager:info("inception on-net: using attributes for an internal call", []);
         _Else -> lager:info("inception ~s: using attributes for an external call", [_Else])
     end,
     lager:info("authorizing id ~s", [whapps_call:authorizing_id(Call)]).

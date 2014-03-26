@@ -59,6 +59,7 @@ send_auth_resp(#auth_user{password=Password
                           ,account_realm=Realm
                           ,account_name=Name
                           ,suppress_unregister_notifications=SupressUnregister
+                          ,register_overwrite_notify=RegisterOverwrite
                          }=AuthUser, JObj) ->
     Category = wh_json:get_value(<<"Event-Category">>, JObj),
     Resp = props:filter_undefined(
@@ -68,6 +69,7 @@ send_auth_resp(#auth_user{password=Password
               ,{<<"Account-Realm">>, Realm}
               ,{<<"Account-Name">>, Name}              
               ,{<<"Suppress-Unregister-Notifications">>, SupressUnregister}
+              ,{<<"Register-Overwrite-Notify">>, RegisterOverwrite}
               ,{<<"Custom-Channel-Vars">>, create_ccvs(AuthUser)}
               | wh_api:default_headers(Category, <<"authn_resp">>, ?APP_NAME, ?APP_VERSION)
              ]),
@@ -96,7 +98,6 @@ create_ccvs(#auth_user{}=AuthUser) ->
              ,{<<"Authorizing-ID">>, AuthUser#auth_user.authorizing_id}
              ,{<<"Authorizing-Type">>, AuthUser#auth_user.authorizing_type}
              ,{<<"Owner-ID">>, AuthUser#auth_user.owner_id}
-             ,{<<"Inception">>, <<"on-net">>}
             ],
     wh_json:from_list(props:filter_undefined(Props)).
 
@@ -260,6 +261,7 @@ jobj_to_auth_user(JObj, Username, Realm) ->
                ,method = wh_json:get_lower_binary(<<"method">>, AuthValue, <<"password">>)
                ,owner_id = wh_json:get_value(<<"owner_id">>, AuthDoc)
                ,suppress_unregister_notifications = wh_json:is_true(<<"suppress_unregister_notifications">>, AuthDoc)
+               ,register_overwrite_notify = wh_json:is_true(<<"register_overwrite_notify">>, AuthDoc)
               }.
 
 %%-----------------------------------------------------------------------------
